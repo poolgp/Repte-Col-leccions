@@ -20,9 +20,12 @@ $canciones = selectCanciones();
     <?php include_once("./php_partials/navBar.php") ?>
 
     <div class="container mt-5">
+
+        <?php require_once('./php_partials/mensajes.php'); ?>
+
         <div class="row">
             <?php foreach ($cantantes as $cantante) : ?>
-                <div class="card" style="width: 18rem;">
+                <div class="card" style="width: 17.8rem;">
                     <img src="<?php echo $cantante['imagen']; ?>" class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">

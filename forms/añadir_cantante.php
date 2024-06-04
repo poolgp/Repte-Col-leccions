@@ -19,19 +19,29 @@ $canciones = selectCanciones();
 
 <body>
     <div class="container">
+
+        <?php require_once('../php_partials/mensajes.php'); ?>
+
+        <?php if (isset($_SESSION['cantante'])) {
+            $cantante = $_SESSION['cantante'];
+            unset($_SESSION['cantante']);
+        } else {
+            $cantante = ['id' => '', 'imagen' => '', 'nombre' => '', 'fecha_nacimiento' => '', 'pais_id' => ''];
+        } ?>
+
         <h2 class="mt-5">Añadir Cantante</h2>
         <form action="../php_controllers/cantanteController.php" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="nombre">Nombre del Cantante</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del Cantante" required autofocus>
+                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del Cantante" required autofocus value="<?php echo $cantante['nombre'] ?>">
             </div>
             <div class="form-group">
                 <label for="fecha_nacimiento">Fecha de Nacimiento</label>
-                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required value="<?php echo $cantante['fecha_nacimiento'] ?>">
             </div>
             <div class="form-group">
                 <label for="pais_id">País</label>
-                <select class="form-control" id="pais_id" name="pais_id" required>
+                <select class="form-control" id="pais_id" name="pais_id" required value="<?php echo $cantante['pais_id'] ?>">
                     <?php foreach ($paises as $pais) : ?>
                         <option value="<?php echo $pais['id']; ?>"><?php echo $pais['nombre']; ?></option>
                     <?php endforeach; ?>
@@ -47,7 +57,7 @@ $canciones = selectCanciones();
             </div>
             <div class="form-group">
                 <label for="imagen">Imagen</label>
-                <input type="file" class="form-control-file" id="imagen" name="imagen" required>
+                <input type="file" class="form-control-file" id="imagen" name="imagen" required value="<?php echo $cantante['imagen'] ?>">
             </div>
             <button type="submit" class="btn btn-primary" name="insertCantante">Aceptar</button>
             <a href="../index.php" class="btn btn-secondary">Cancelar</a>

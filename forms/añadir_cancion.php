@@ -16,6 +16,9 @@ $cantantes = selectCantantes();
 
 <body>
     <div class="container">
+
+    <?php require_once('../php_partials/mensajes.php'); ?>
+
         <h2 class="mt-5">Añadir Canción</h2>
         <form action="../php_controllers/cancionController.php" method="POST">
             <div class="form-group">

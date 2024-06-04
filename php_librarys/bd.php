@@ -1,4 +1,38 @@
 <?php
+session_start();
+
+function errorMessage($ex)
+{
+    if (!empty($ex->errorInfo[1])) {
+        switch ($ex->errorInfo[1]) {
+            case 1062:
+                $mensaje = 'Registro ducplicado';
+                break;
+            case 1451:
+                $mensaje = 'Registro con elementos relacionados';
+                break;
+            default:
+                $mensaje = $ex->errorInfo[1] . ' - ' . $ex->errorInfo[2];
+                break;
+        }
+    } else {
+        switch ($ex->getCode()) {
+            case 1044:
+                $mensaje = "Usuario y/o password incorrectos";
+                break;
+            case 1049:
+                $mensaje = "Base de datos deconocida";
+                break;
+            case 2002:
+                $mensaje = "No se encuentra el servidor";
+                break;
+            default:
+                $mensaje = $ex->getCode() . ' - ' . $ex->getMessage();
+                break;
+        }
+    }
+    return $mensaje;
+}
 
 function openBD()
 {
@@ -46,19 +80,6 @@ function selectCanciones()
     return $resultado;
 }
 
-// function selectCantantes()
-// {
-//     $conn = openBD();
-
-//     $sentenciaText = "select * from musica.cantantes order by id";
-//     $sentencia = $conn->prepare($sentenciaText);
-//     $sentencia->execute();
-
-//     $resultado = $sentencia->fetchAll();
-
-//     $conn = closeBD();
-//     return $resultado;
-// }
 function selectCantantes()
 {
     $conn = openBD();
@@ -80,25 +101,37 @@ function selectCantantes()
 
 function insertCantante($id, $imagen, $nombre, $fecha_nacimiento, $pais_id)
 {
-    $conn = openBD();
+    try {
+        $conn = openBD();
 
-    $rutaImg = "/Repte-Col-leccions/img/";
+        $rutaImg = "/Repte-Col-leccions/img/";
 
-    $fechaActual = date("Ymd_His");
+        $fechaActual = date("Ymd_His");
 
-    $nombreArchivo = $fechaActual . "-" . $_FILES['imagen']['name'];
-    $imgSubida = $rutaImg . $nombreArchivo;
+        $nombreArchivo = $fechaActual . "-" . $_FILES['imagen']['name'];
+        $imgSubida = $rutaImg . $nombreArchivo;
 
-    move_uploaded_file($_FILES['imagen']['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $imgSubida);
+        move_uploaded_file($_FILES['imagen']['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $imgSubida);
 
-    $sentenciaText = "insert into musica.cantantes (id, imagen, nombre, fecha_nacimiento, pais_id) values (:id, :imagen, :nombre, :fecha_nacimiento, :pais_id)";
-    $sentencia = $conn->prepare($sentenciaText);
-    $sentencia->bindParam(':id', $id);
-    $sentencia->bindParam(':imagen', $imagen);
-    $sentencia->bindParam(':nombre', $nombre);
-    $sentencia->bindParam(':fecha_nacimiento', $fecha_nacimiento);
-    $sentencia->bindParam(':pais_id', $pais_id);
-    $sentencia->execute();
+        $sentenciaText = "insert into musica.cantantes (id, imagen, nombre, fecha_nacimiento, pais_id) values (:id, :imagen, :nombre, :fecha_nacimiento, :pais_id)";
+        $sentencia = $conn->prepare($sentenciaText);
+        $sentencia->bindParam(':id', $id);
+        $sentencia->bindParam(':imagen', $imagen);
+        $sentencia->bindParam(':nombre', $nombre);
+        $sentencia->bindParam(':fecha_nacimiento', $fecha_nacimiento);
+        $sentencia->bindParam(':pais_id', $pais_id);
+        $sentencia->execute();
+
+        $_SESSION['mensaje'] = 'Registro insertado correctamente';
+    } catch (PDOException $ex) {
+        $_SESSION['error'] = errorMessage($ex);
+        $cantante['id'] = $id;
+        $cantante['imagen'] = $imagen;
+        $cantante['nombre'] = $nombre;
+        $cantante['fecha_nacimiento'] = $fecha_nacimiento;
+        $cantante['pais_id'] = $pais_id;
+        $_SESSION['cantante'] = $cantante;
+    }
 
     $conn = closeBD();
 }
