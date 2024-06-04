@@ -1,5 +1,5 @@
 <?php
-// session_start();
+session_start();
 
 function errorMessage($ex)
 {
@@ -116,18 +116,18 @@ function insertCantante($imagen, $nombre, $fecha_nacimiento, $pais_id, $cancione
 
         $sentenciaText = "insert into musica.cantantes (imagen, nombre, fecha_nacimiento, pais_id) values (:imagen, :nombre, :fecha_nacimiento, :pais_id)";
         $sentencia = $conn->prepare($sentenciaText);
-        // $sentencia->bindParam(':imagen', $imagen);
+        $sentencia->bindParam(':imagen', $imagen);
         $sentencia->bindParam(':nombre', $nombre);
         $sentencia->bindParam(':fecha_nacimiento', $fecha_nacimiento);
         $sentencia->bindParam(':pais_id', $pais_id);
         $sentencia->execute();
 
+        $sentenciaText = "insert into spbd.cantantes_canciones (cantante_id, cancion_id) values (:cantante_id, :cancion_id)";
+        $sentencia = $conn->prepare($sentenciaText);
         foreach ($canciones_ids as $cancion_id) {
-            echo $cancion_id;
-            // $sentenciaText = "insert into musica.cantantes_canciones (cantante_id, cancion_id) values (:cantante_id, :cancion_id)";
-            // $sentencia = $conn->prepare($sentenciaText);
-            // $sentencia->bindParam(':cantante_id', $b);
-            // $sentencia->bindParam(':cancion_id', $a);
+            $sentencia->bindParam(':cantante_id', $lastInsertedId);
+            $sentencia->bindParam(':cancion_id', $cancion_id);
+            $sentencia->execute();
         }
 
         $_SESSION['mensaje'] = 'Registro insertado correctamente';
