@@ -49,7 +49,7 @@ $canciones = selectCanciones();
             </div>
             <div class="form-group">
                 <label for="cancion_id">Canciones</label>
-                <select multiple class="form-control" id="cancion_id" name="cancion_id[]">
+                <select multiple class="form-control" id="cancion_id" name="canciones_ids[]">
                     <?php foreach ($canciones as $cancion) : ?>
                         <option value="<?php echo $cancion['id']; ?>"><?php echo $cancion['nombre']; ?></option>
                     <?php endforeach; ?>

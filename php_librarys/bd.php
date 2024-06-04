@@ -1,5 +1,5 @@
 <?php
-session_start();
+// session_start();
 
 function errorMessage($ex)
 {
@@ -99,8 +99,9 @@ function selectCantantes()
     return $resultado;
 }
 
-function insertCantante($id, $imagen, $nombre, $fecha_nacimiento, $pais_id)
+function insertCantante($imagen, $nombre, $fecha_nacimiento, $pais_id, $canciones_ids)
 {
+    echo "hola";
     try {
         $conn = openBD();
 
@@ -113,19 +114,25 @@ function insertCantante($id, $imagen, $nombre, $fecha_nacimiento, $pais_id)
 
         move_uploaded_file($_FILES['imagen']['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $imgSubida);
 
-        $sentenciaText = "insert into musica.cantantes (id, imagen, nombre, fecha_nacimiento, pais_id) values (:id, :imagen, :nombre, :fecha_nacimiento, :pais_id)";
+        $sentenciaText = "insert into musica.cantantes (imagen, nombre, fecha_nacimiento, pais_id) values (:imagen, :nombre, :fecha_nacimiento, :pais_id)";
         $sentencia = $conn->prepare($sentenciaText);
-        $sentencia->bindParam(':id', $id);
-        $sentencia->bindParam(':imagen', $imagen);
+        // $sentencia->bindParam(':imagen', $imagen);
         $sentencia->bindParam(':nombre', $nombre);
         $sentencia->bindParam(':fecha_nacimiento', $fecha_nacimiento);
         $sentencia->bindParam(':pais_id', $pais_id);
         $sentencia->execute();
 
+        foreach ($canciones_ids as $cancion_id) {
+            echo $cancion_id;
+            // $sentenciaText = "insert into musica.cantantes_canciones (cantante_id, cancion_id) values (:cantante_id, :cancion_id)";
+            // $sentencia = $conn->prepare($sentenciaText);
+            // $sentencia->bindParam(':cantante_id', $b);
+            // $sentencia->bindParam(':cancion_id', $a);
+        }
+
         $_SESSION['mensaje'] = 'Registro insertado correctamente';
     } catch (PDOException $ex) {
         $_SESSION['error'] = errorMessage($ex);
-        $cantante['id'] = $id;
         $cantante['imagen'] = $imagen;
         $cantante['nombre'] = $nombre;
         $cantante['fecha_nacimiento'] = $fecha_nacimiento;
