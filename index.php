@@ -29,12 +29,12 @@ $canciones = selectCanciones();
                     <img src="<?php echo $cantante['imagen']; ?>" class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">
-                            <?php echo $cantante['nombre'] ?>
+                            <?php echo $cantante['nombre']; ?>
                         </h5>
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">
-                            <?php echo $cantante['fecha_nacimiento'] ?>
+                            <?php echo $cantante['fecha_nacimiento']; ?>
                         </li>
                         <li class="list-group-item">
                             <?php
@@ -48,6 +48,20 @@ $canciones = selectCanciones();
                         </li>
                         <li class="list-group-item">
                             <?php echo $cantante['canciones'] ? $cantante['canciones'] : 'No tiene canciones asignadas'; ?>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <form action="./php_controllers/cantanteController.php" method="post">
+                                <input type="hidden" name="id" value="<?php echo $cantante['id']; ?>">
+                                <button type="submit" id="boton" name="editarCantante" title="Editar Cantante">
+                                    Editar
+                                </button>
+                            </form>
+                            <form action="./php_controllers/cantanteController.php" method="post">
+                                <input type="hidden" name="id" value="<?php echo $cantante['id']; ?>">
+                                <button type="submit" id="boton" name="eliminarCantante" title="Eliminar Cantante">
+                                    Eliminar
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </div>

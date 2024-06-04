@@ -192,3 +192,35 @@ function insertCancion($nombre, $cantanteIds)
 
     $conn = closeBD();
 }
+
+function editarCantante()
+{
+    try {
+        $conexion = openBD();
+
+        $sentenciaText = "DELETE FROM musica.cantantes WHERE id = :id";
+        $sentencia = $conexion->prepare($sentenciaText);
+        $sentencia->bindParam(':id', $id);
+        $sentencia->execute();
+
+        $_SESSION['mensaje'] = 'Registro editado correctamente';
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+function eliminarCantante($id)
+{
+    try {
+        $conexion = openBD();
+
+        $sentenciaText = "DELETE FROM musica.cantantes WHERE id = :id";
+        $sentencia = $conexion->prepare($sentenciaText);
+        $sentencia->bindParam(':id', $id);
+        $sentencia->execute();
+
+        $_SESSION['mensaje'] = 'Registro eliminado correctamente';
+    } catch (PDOException $e) {
+        return false;
+    }
+}
