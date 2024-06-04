@@ -46,11 +46,29 @@ function selectCanciones()
     return $resultado;
 }
 
+// function selectCantantes()
+// {
+//     $conn = openBD();
+
+//     $sentenciaText = "select * from musica.cantantes order by id";
+//     $sentencia = $conn->prepare($sentenciaText);
+//     $sentencia->execute();
+
+//     $resultado = $sentencia->fetchAll();
+
+//     $conn = closeBD();
+//     return $resultado;
+// }
 function selectCantantes()
 {
     $conn = openBD();
 
-    $sentenciaText = "select * from musica.cantantes order by id";
+    $sentenciaText = "SELECT cantantes.id, cantantes.imagen, cantantes.nombre, cantantes.fecha_nacimiento, paises.nombre AS nombre_pais, GROUP_CONCAT(canciones.nombre SEPARATOR ', ') AS canciones
+                      FROM cantantes
+                      LEFT JOIN paises ON cantantes.pais_id = paises.id
+                      LEFT JOIN cantantes_canciones ON cantantes.id = cantantes_canciones.cantante_id
+                      LEFT JOIN canciones ON cantantes_canciones.cancion_id = canciones.id
+                      GROUP BY cantantes.id";
     $sentencia = $conn->prepare($sentenciaText);
     $sentencia->execute();
 
@@ -87,36 +105,57 @@ function insertCantante($id, $imagen, $nombre, $fecha_nacimiento, $pais_id)
 
 function jointPais()
 {
-    try {
-        $conn = openBD();
+    $conn = openBD();
 
-        $sentenciaText = "SELECT cantantes.id, cantantes.nombre AS nombre_cantante, cantantes.fecha_nacimiento, paises.nombre AS nombre_pais
+    $sentenciaText = "SELECT cantantes.id, cantantes.nombre AS nombre_cantante, cantantes.fecha_nacimiento, paises.nombre AS nombre_pais
         FROM cantantes
         INNER JOIN paises ON cantantes.pais_id = paises.id";
 
-        $sentencia = $conn->prepare($sentenciaText);
-        $sentencia->execute();
+    $sentencia = $conn->prepare($sentenciaText);
+    $sentencia->execute();
 
-        $resultado = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+    $resultado = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
-        $conn = closeBD();
+    $conn = closeBD();
 
-        return $resultado;
-    } catch (\Throwable $th) {
-        return array();
-    }
+    return $resultado;
 }
 
-function insertCancion($id, $nombre)
+function insertCancion($nombre, $cantanteIds)
 {
     $conn = openBD();
 
-    $sentenciaText = "insert into musica.canciones (id, nombre, cantante_id) values (:id, :nombre, :cantante_id)";
+    // $sentenciaText = "insert into musica.canciones (id, nombre, cantante_id) values (:id, :nombre, :cantante_id)";
+    // $sentencia = $conn->prepare($sentenciaText);
+    // $sentencia->bindParam(':id', $id);
+    // $sentencia->bindParam(':nombre', $nombre);
+    // $sentencia->bindParam(':cantante_id', $cantante_id);
+    // $sentencia->execute();
+
+    // Inicia una transacción
+    $conn->beginTransaction();
+
+    // Inserta la canción
+    $sentenciaText = "INSERT INTO musica.canciones (nombre) VALUES (:nombre)";
     $sentencia = $conn->prepare($sentenciaText);
-    $sentencia->bindParam(':id', $id);
     $sentencia->bindParam(':nombre', $nombre);
-    $sentencia->bindParam(':cantante_id', $cantante_id);
     $sentencia->execute();
+
+    // Obtén el ID de la canción insertada
+    $cancionId = $conn->lastInsertId();
+
+    // Inserta las relaciones en la tabla intermedia
+    $sentenciaText = "INSERT INTO musica.cantantes_canciones (cantante_id, cancion_id) VALUES (:cantante_id, :cancion_id)";
+    $sentencia = $conn->prepare($sentenciaText);
+
+    foreach ($cantanteIds as $cantanteId) {
+        $sentencia->bindParam(':cantante_id', $cantanteId);
+        $sentencia->bindParam(':cancion_id', $cancionId);
+        $sentencia->execute();
+    }
+
+    // Confirma la transacción
+    $conn->commit();
 
     $conn = closeBD();
 }

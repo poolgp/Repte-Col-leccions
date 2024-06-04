@@ -44,18 +44,9 @@ $canciones = selectCanciones();
                             ?>
                         </li>
                         <li class="list-group-item">
-                            <?php
-                            foreach ($canciones as $cancion) {
-                                if ($cancion['id'] == $cantante['id']) {
-                                    echo $cancion['nombre'];
-                                    break;
-                                }
-                            }
-                            ?>
+                            <?php echo $cantante['canciones'] ? $cantante['canciones'] : 'No tiene canciones asignadas'; ?>
                         </li>
                     </ul>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
                 </div>
             <?php endforeach; ?>
         </div>
